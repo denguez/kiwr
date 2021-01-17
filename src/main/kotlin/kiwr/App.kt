@@ -3,6 +3,7 @@ package kiwr
 import spark.Spark.*
 import spark.Request
 import spark.Response
+import spark.template.velocity.VelocityTemplateEngine
 
 import javax.imageio.ImageIO
 import java.io.ByteArrayOutputStream;
@@ -13,30 +14,36 @@ import com.google.zxing.client.j2se.MatrixToImageWriter
 
 fun main() {
     port(8080)
-    get("/qr", info)
-    get("/qr/", info)
-    get("/qr/:str", ::qr_generate)
-    get("/qr/:str/:size", ::qr_generate)
+    get("/qr", home)
+    get("/qr/", home)
+    post("/qr/encode", ::qr_generate)
 }
 
 // QR
 
-val info: (Request, Response) -> String = {_, _ -> 
-    "Generate QR -> /qr/www.example.com"
+val home: (Request, Response) -> Any = {_, _ -> 
+    VelocityTemplateEngine().render(
+        modelAndView(HashMap<String, Any>(), "model.vm")
+    )
 }
 
 fun qr_generate(req: Request, res: Response) {
-    val str = req.params("str")
-    val size = parse_int(req.params("size"))
+    val txt: String = req.queryParams("txt")
+    val size = parse_int(req.queryParams("size"))
     res.type("image/png")
-    res.header("Content-Disposition", "inline; filename=${str}.png")
-    res write (str qr_encode size) 
+    res.header("Content-Disposition", "inline; filename=${txt}.png")
+    res write (txt qr_encode size) 
 }
 
+
 fun parse_int(size: String?) : Int {
-    return size?.let { it.runCatching { toInt() }
-        .map { if (it < 1000) it else 1000 }
-        .getOrDefault(350)
+    return size?.let { 
+        it.runCatching { toInt() }
+            .map { 
+                if (it < 10) 350 
+                else if (it > 1000) 1000 
+                else it 
+            }.getOrDefault(350)
     } ?: 350
 }
 
@@ -52,9 +59,9 @@ infix fun Response.write(image: ByteArray) {
 infix fun String.qr_encode(size: Int) : ByteArray {
     val code = QRCodeWriter().encode(this, BarcodeFormat.QR_CODE, size, size)
     val image = MatrixToImageWriter.toBufferedImage(code)
-    return ByteArrayOutputStream().use { stream ->
-        ImageIO.write(image, "png", stream)
-        stream.toByteArray()
+    return ByteArrayOutputStream().use { 
+        ImageIO.write(image, "png", it)
+        it.toByteArray()
     }
 }
 

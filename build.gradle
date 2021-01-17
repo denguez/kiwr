@@ -25,6 +25,7 @@ dependencies {
 
     //Spark
     compile 'com.sparkjava:spark-core:2.5.4'
+    implementation 'com.sparkjava:spark-template-velocity:2.7.1'
 
     // Use the Kotlin JUnit integration.
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'

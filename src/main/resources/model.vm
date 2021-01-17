@@ -1,0 +1,59 @@
+<html>
+<head>
+    <title>Generate QR</title>
+    <script type="text/javascript">
+        #include("download.js")
+        #include("script.js")
+    </script>
+
+    <style>
+        h1 {
+            text-align:center;
+        }
+        #content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 75%;
+            margin-left: -350px;
+        }
+        input {
+            width: 100%; 
+        }
+        label {
+            display: block;
+            width: 100%;
+            text-align: right;
+        }
+        .labels {
+            display: grid;
+            margin-right: 30px;
+        }
+        button {
+            margin-top: 35px;
+        }
+        body {
+            display: grid;
+            justify-items: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generate QR</h1>
+    <div id="content">
+        <div class="labels">
+            <label for="txt">Enter any text</label>
+            <label for="size">Size</label>
+        </div>
+        <div>
+            <input type="text" id="txt" name="txt">
+            <input type="number" id="size" name="size" value="350">
+        </div>
+    </div>
+    <button type="submit" onClick="encode();">Download</button>
+</body>
+</html>
+
+
+
+
+
